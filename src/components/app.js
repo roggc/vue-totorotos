@@ -6,8 +6,7 @@ export default Vue.extend({
     name:'myApp',
     data(){
         return {
-            x:new Appx(),
-            switch:true
+            x:new Appx()
         }
     },
     beforeMount(){
@@ -19,8 +18,8 @@ export default Vue.extend({
         `
         return (
             <General> 
-                <MdButton class='md-raised md-primary'>click</MdButton>
-                <MdSwitch vModel={this.switch} class='md-primary'/>
+                <MdToolbar></MdToolbar>
+                <MdDrawer></MdDrawer>
             </General>
         )
     }
