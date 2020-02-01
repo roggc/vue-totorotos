@@ -9,7 +9,8 @@ import * as firebase from "firebase/app"
 import "firebase/auth"
 import io from 'socket.io-client'
 
-const socket = io('localhost:5000')
+// const socket = io('localhost:5000')
+const socket = io('https://us-central1-totorotos-api.cloudfunctions.net/api1')
 
 export default Vue.extend({
     name:'myApp',
