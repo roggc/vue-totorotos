@@ -29,8 +29,8 @@ export default Vue.extend({
         `
         var variables={}
 
-// var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
-var url = 'http://localhost:5000',
+var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
+// var url = 'http://localhost:5000',
     options = {
         method: 'POST',
         headers: {
@@ -62,8 +62,8 @@ fetch(url, options).then(resp=>resp.json())
                     }
         
         
-        // var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
-        var url = 'http://localhost:5000',
+        var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
+        // var url = 'http://localhost:5000',
             options = {
                 method: 'POST',
                 headers: {
@@ -101,8 +101,8 @@ fetch(url, options).then(resp=>resp.json())
             }
 
 
-// var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
-var url = 'http://localhost:5000',
+var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
+// var url = 'http://localhost:5000',
     options = {
         method: 'POST',
         headers: {
@@ -236,8 +236,8 @@ var variables = {
     date:(new Date()).toString().substring(0,24)
 }
 
-{/* var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1', */}
-var url = 'http://localhost:5000',
+var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
+{/* var url = 'http://localhost:5000', */}
     options = {
         method: 'POST',
         headers: {
