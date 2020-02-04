@@ -7,10 +7,15 @@ import Card from './card'
 import Card2 from './card2'
 import * as firebase from "firebase/app"
 import "firebase/auth"
-import io from 'socket.io-client'
 
-// const socket = io('localhost:5000')
-const socket = io('https://us-central1-totorotos-api.cloudfunctions.net/api1')
+// const url='http://localhost:5000'
+// const urlWs='ws://localhost:5000'
+// const url='https://us-central1-totorotos-api.cloudfunctions.net/api1'
+// const urlWs='wss://us-central1-totorotos-api.cloudfunctions.net/api1'
+const url='https://totorotos-api.herokuapp.com'
+const urlWs='wss://totorotos-api.herokuapp.com'
+
+var ws = new WebSocket(urlWs)
 
 export default Vue.extend({
     name:'myApp',
@@ -23,6 +28,50 @@ export default Vue.extend({
         this.x.commit({type:'init'})
     },
     mounted(){
+        ws.onmessage = (that=>function(msg) {
+                        var query=`
+            query($email:String!){
+                getPosts(email:$email){
+                  name
+                  message
+                  photo
+                  email
+                  date
+                }
+              }
+            `
+
+            var variables={
+                email:msg.data
+            }
+
+var options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            query,
+            variables
+        })
+    }
+
+fetch(url, options).then(resp=>resp.json())
+                   .then(json=>{
+                       const arrs=that.x.s.card2xs.filter(a=>{
+                           if(a[0].email!==msg.data){
+                               return true
+                           }
+                       })
+                       arrs.push(json.data.getPosts.sort((a,b)=>{
+                           return Date.parse(b.date)-Date.parse(a.date)
+                       }))
+                       that.x.s.card2xs=arrs
+                    })
+                   .catch(e=>console.log(e))
+          })(this)
+
         var query=`
         query{
             getEmails
@@ -30,9 +79,7 @@ export default Vue.extend({
         `
         var variables={}
 
-var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
-// var url = 'http://localhost:5000',
-    options = {
+var options = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -63,9 +110,7 @@ fetch(url, options).then(resp=>resp.json())
                     }
         
         
-        var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
-        // var url = 'http://localhost:5000',
-            options = {
+        var options = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -79,55 +124,14 @@ fetch(url, options).then(resp=>resp.json())
         
         fetch(url, options).then(resp=>resp.json())
                            .then(json=>{
-                               this.x.s.card2xs.push(json.data.getPosts)})
+                               this.x.s.card2xs.push(json.data.getPosts.sort(
+                                   (a,b)=>{
+                                       return Date.parse(b.date)-Date.parse(a.date)
+                                   }
+                               ))})
                            .catch(e=>console.log(e))
                    }))
                    .catch(e=>console.log(e))
-
-        socket.on('updated',(that=> function(payload){
-            var query=`
-            query($email:String!){
-                getPosts(email:$email){
-                  name
-                  message
-                  photo
-                  email
-                  date
-                }
-              }
-            `
-
-            var variables={
-                email:payload.email
-            }
-
-
-var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
-// var url = 'http://localhost:5000',
-    options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-            query,
-            variables
-        })
-    }
-
-fetch(url, options).then(resp=>resp.json())
-                   .then(json=>{
-                       const arrs=that.x.s.card2xs.filter(a=>{
-                           if(a[0].email!==payload.email){
-                               return true
-                           }
-                       })
-                       arrs.push(json.data.getPosts)
-                       that.x.s.card2xs=arrs
-                    })
-                   .catch(e=>console.log(e))
-          })(this))
     },
     render(){
         const General=s.div`
@@ -136,11 +140,6 @@ fetch(url, options).then(resp=>resp.json())
         return (
             <General> 
                 <MdToolbar>
-                {/* <MdButton class="md-icon-button" vOn:click={()=>{
-                    this.x.s.showDrawer=true
-                    }}>
-          <MdIcon>menu</MdIcon>
-        </MdButton> */}
                     <span class="md-title">TOTOROTO'S VIP</span>
                     <div class="md-toolbar-section-end">
                         {!this.x.s.userLoggedIn&&<a style='cursor:pointer;'
@@ -164,58 +163,6 @@ fetch(url, options).then(resp=>resp.json())
                         }}>sign in w/ google</a>}
                     </div>
                 </MdToolbar>
-                {/* <MdDrawer  md-active={this.x.s.showDrawer}>     
-<MdToolbar>
-<div class="md-toolbar-section-end">
-            <MdButton class="md-icon-button md-dense" vOn:click={()=>{
-                this.x.s.showDrawer=false
-                }}>
-              <MdIcon>keyboard_arrow_left</MdIcon>
-            </MdButton>
-          </div>
-</MdToolbar>
-        <MdList>
-        <MdListItem>
-                <MdIcon>dashboard</MdIcon>
-                <div class='md-toolbar-section-start'>
-                    <MdButton class='md-primary' vOn:click={()=>{
-                        this.x.s.userPage=false
-                        this.x.s.cardPage=false
-                        this.x.s.mainPage=true
-                        }}>
-                        <span class="md-list-item-text">MAIN</span>
-                    </MdButton>
-                </div>
-            </MdListItem>
-            <MdListItem>
-                <MdIcon>verified_user</MdIcon>
-                <div class='md-toolbar-section-start'>
-                    <MdButton class='md-primary' vOn:click={()=>{
-                        this.x.s.mainPage=false
-                        this.x.s.cardPage=false
-                        this.x.s.userPage=true
-                        }}>
-                        <span class="md-list-item-text">USER</span>
-                    </MdButton>
-                </div>
-            </MdListItem>
-            <MdListItem>
-                <MdIcon>edit</MdIcon>
-                <div class='md-toolbar-section-start'>
-                    <MdButton class='md-primary' vOn:click={()=>{
-                        this.x.s.mainPage=false
-                        this.x.s.userPage=false
-                        this.x.s.cardPage=true
-                        }}>
-                        <span class="md-list-item-text">CARD</span>
-                    </MdButton>
-                </div>
-            </MdListItem>
-        </MdList>
-                </MdDrawer> */}
-                {/* {this.x.s.mainPage&& <Main x={this.x.s.mainx}/>}
-                {this.x.s.userPage&& <User x={this.x.s.userx}/>}
-                {this.x.s.cardPage&& <Card x={this.x.s.cardx}/>} */}
                 {this.x.s.userLoggedIn&&<div style='margin:20px;'>
                 <MdField>
                     <label>Write a thought:</label>
@@ -237,9 +184,7 @@ var variables = {
     date:(new Date()).toString().substring(0,24)
 }
 
-var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
-{/* var url = 'http://localhost:5000', */}
-    options = {
+var options = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -252,16 +197,13 @@ var url = 'https://us-central1-totorotos-api.cloudfunctions.net/api1',
     }
 
 fetch(url, options).then(resp=>resp.json())
-                   .then(json=>console.log(json.data.postMessage))
+                   .then(json=>json.data.postMessage)
                    .catch(e=>console.log(e))
 
                     }}>Post</MdButton>
-                    {/* <MdButton class='md-primary'
-                    vOn:click={()=>{
-                        console.log((new Date()).toString()
-                        .substring(0,24))
-                    }}>POST2</MdButton> */}
                 </div>}
+                {this.x.s.card2xs.length===0&&
+                <MdProgressSpinner md-mode="indeterminate"></MdProgressSpinner>}
                 {this.x.s.card2xs.map(card2x=><Card2 x={card2x}/>)}
             </General>
         )

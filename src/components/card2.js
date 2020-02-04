@@ -29,7 +29,7 @@ export default Vue.extend({
                 <hr/>
                 <Content>
                     {this.x.map(xi=><div>
-                    <span>📍<em>{xi.date}:</em> </span>
+                    <span>📍<strong><em>{xi.date}:</em></strong> </span>
                     <span>{xi.message}</span>
                         </div>)}
                 </Content>
